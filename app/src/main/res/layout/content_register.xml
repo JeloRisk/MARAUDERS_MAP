@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <!-- Header Image -->
+    <ImageView
+        android:id="@+id/header_image"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:src="@drawable/a"
+        android:scaleType="centerCrop"/>
+
+    <!-- Header Text -->
+    <TextView
+        android:id="@+id/header_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/header_image"
+        android:layout_marginTop="16dp"
+        android:text="There is no place like HOME."
+        android:textColor="#222222"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Logo Image -->
+    <ImageView
+        android:id="@+id/logo_image"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:src="@drawable/a"
+        android:scaleType="centerCrop"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="16dp"/>
+
+    <!-- Contact Details -->
+    <LinearLayout
+        android:id="@+id/contact_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="32dp"
+        android:layout_below="@+id/header_text"
+        android:paddingHorizontal="16dp">
+
+        <!-- Contact Title -->
+        <TextView
+            android:id="@+id/contact_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Contact Us"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#222222"/>
+
+        <!-- Mobile Number -->
+        <LinearLayout
+            android:id="@+id/mobile_number_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:id="@+id/mobile_number_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_contact"
+                android:contentDescription="@string/mobile_number"/>
+
+            <TextView
+                android:id="@+id/mobile_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="123-456-7890"
+                android:textSize="16sp"
+                android:textColor="#222222"
+                android:layout_marginStart="16dp"/>
+
+        </LinearLayout>
+
+        <!-- Landline Number -->
+        <LinearLayout
+            android:id="@+id/landline_number_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:id="@+id/landline_number_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/a"
+                android:contentDescription="@string/landline_number"/>
+
+            <TextView
+                android:id="@+id/landline_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="555-123-4567"
+                android:textSize="16sp"
+                android:textColor="#222222"
+                android:layout_marginStart="16dp"/>
+
+        </LinearLayout>
+
+        <!-- Email Address -->
+        <LinearLayout
+            android:id="@+id/email_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:id="@+id/email_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_email"
+                android:contentDescription="@string/email_address"/>
+
+            <TextView
+                android:id="@+id/email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="info@example.com"
+                android:textSize="16sp"
+                android:textColor="#222222"
+                android:layout_marginStart="16dp"/>
+
+        </LinearLayout>
+
+        <!-- Address -->
+        <LinearLayout
+            android:id="@+id/address_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:id="@+id/address_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_address"
+                android:contentDescription="@string/address"/>
+
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="123 Main Street, Anytown, USA"
+                android:textSize="16sp"
+                android:textColor="#222222"
+                android:layout_marginStart="16dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

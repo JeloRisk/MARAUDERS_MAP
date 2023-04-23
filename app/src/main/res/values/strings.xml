@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">MARAUDERS_MAP</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="title_activity_register">Register</string>
+    <string name="title_activity_new_map">newMap</string>
+    <string name="token">sk.eyJ1Ijoid2NrZHgiLCJhIjoiY2xnbTlibXM4MDNrczNtbW1yOTIzZGRnciJ9.iprtEow-pTVMS0Qag1y8MQ</string>
+    <string name="mapbox_access_token">pk.eyJ1Ijoid2NrZHgiLCJhIjoiY2xkeDd5M2dwMDdkNDNucHJncnN2bXo5MyJ9.VHcOWHs59dX9qPEtEXC96w</string>
+    <string name="user_location_permission_not_granted">sorry</string>
+    <string name="user_location_permission_explanation">sorry 2</string>
+    <string name="mobile_number">012</string>
+    <string name="landline_number">1212121</string>
+    <string name="email_address">asasas</string>
+    <string name="address">asasaq</string>
+    <string name="password_hint">Password</string>
+    <string name="haveAccount">Already have an account? Login Now.</string>
+    <string name="register_title">Register</string>
+
+    <string-array name="gender_options">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+    <string name="title_activity_registration_pending">RegistrationPendingActivity</string>
+
+</resources>

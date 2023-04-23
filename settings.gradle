@@ -1,0 +1,18 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
+// For this you need to remove the dependencyResolutionManagement block from the setting.gradle file (=the new way). And then the repositories config in your build.gradle will work again (=the old way).
+//dependencyResolutionManagement {
+//    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+//    repositories {
+//        google()
+//        mavenCentral()
+//    }
+//}
+rootProject.name = "MARAUDERS_MAP"
+include ':app'
