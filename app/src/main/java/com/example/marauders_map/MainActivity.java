@@ -1,5 +1,6 @@
 package com.example.marauders_map;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityOptions;
@@ -8,14 +9,21 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
+
 import androidx.appcompat.widget.Toolbar;
+
 import android.content.Intent;
 import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Map;
 
@@ -26,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     Button button1;
     TextView textView;
     FirebaseUser user;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
 //    private Toolbar toolbar;
@@ -36,10 +45,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
-//        getSupportActionBar().hide();
-//        Toolbar toolbar = findViewById(R.id.toolbar); // inflate your custom Toolbar
-//        setSupportActionBar(toolbar); // set it as the action bar for the activity
-//        getSupportActionBar().hide();
+
         // get the button view and set an onClickListener
         buttonstart = (Button) findViewById(R.id.button);
         buttonstart.setOnClickListener(new View.OnClickListener() {
@@ -63,57 +69,72 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        if(user == null){
-            Intent intent = new Intent(getApplicationContext(), Login.class);
-            startActivity(intent);
-            finish();
-        }
-        else{
-            textView.setText(user.getEmail());
-        }
-    }
-
-    // method to go to the next page (GuessingGame activity)
-//    public void goToNextPage() {
-//        Intent intent = new Intent(this, GuessingGame.class);
-//        startActivity(intent);
-//        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_in_left);
-//    }
-
-//    public void goToNextPage() {
-//        Intent intent = new Intent(this, GuessingGame.class);
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            // Create a new bundle for the transition options
-//            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
-//
-//            // Start the activity with the transition options bundle
-//            startActivity(intent, bundle);
-//        } else {
-//            // For older versions of Android, start the activity without the transition animation
+//        if(user == null){
+//            Intent intent = new Intent(getApplicationContext(), Login.class);
 //            startActivity(intent);
+//            finish();
 //        }
-//    }
+//        else{
+//            textView.setText(user.getEmail());
+//
+//        }
+
+    }
 
     public void goToNextPage() {
-        Intent intent = new Intent(this, RegistrationPendingActivity.class);
+        if (user != null) {
+            String uid = user.getUid();
+            DocumentReference userRef = db.collection("drivers").document(uid);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // Create a new bundle for the transition options
-            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
-
-            // Create a handler to post a delayed message to start the activity
-            new Handler().postDelayed(new Runnable() {
+            userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
-                public void run() {
-                    // Start the activity with the transition options bundle after the delay
-                    startActivity(intent, bundle);
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (documentSnapshot.exists()) {
+                        // Get the user data as a map
+                        Map<String, Object> userData = documentSnapshot.getData();
+
+                        // Get the user's name and display it
+                        String firstName = (String) userData.get("firstName");
+                        String accountStatus = (String) userData.get("accountStatus");
+
+                        textView.setText("Welcome, " + firstName + "!");
+
+                        // Get the user's birthday
+                        String birthday = (String) userData.get("birthday");
+                        // Do something with the birthday
+                        Intent intent;
+                        if (accountStatus.equals("unverified")){
+                            intent = new Intent(MainActivity.this, RegistrationPendingActivity.class);
+                        } else{
+                            intent = new Intent(MainActivity.this, Register.class);
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            // Create a new bundle for the transition options
+                            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this).toBundle();
+
+                            // Create a handler to post a delayed message to start the activity
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Start the activity with the transition options bundle after the delay
+                                    startActivity(intent, bundle);
+                                }
+                            }, 500); // Delay the message by 500 milliseconds (0.5 seconds)
+                        } else {
+                            // For older versions of Android, start the activity without the transition animation
+                            startActivity(intent);
+                        }
+                    }
                 }
-            }, 500); // Delay the message by 500 milliseconds (0.5 seconds)
-        } else {
-            // For older versions of Android, start the activity without the transition animation
-            startActivity(intent);
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    // Handle the error
+                }
+            });
         }
     }
+
+
 
 }

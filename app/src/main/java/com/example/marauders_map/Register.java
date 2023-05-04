@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -31,6 +33,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -46,11 +50,15 @@ public class Register extends AppCompatActivity {
     private CheckBox checkBox;
     private String CustomerOnlineID;
     private DatabaseReference CustomerDatabaseRef;
+    private ImageView idImageView;
 
-    private ProgressDialog loadingbar;
+    private Button uploadIdButton;
     private ProgressBar progressBar;
     private FirebaseAuth mAuth;
-    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://para-5564c-default-rtdb.firebaseio.com/");
+    FirebaseFirestore db;
+
+    //    CollectionReference usersRef = db.collection("drivers");
+//    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://para-5564c-default-rtdb.firebaseio.com/");
     TextView textView;
 
     @Override
@@ -68,6 +76,7 @@ public class Register extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
@@ -85,6 +94,7 @@ public class Register extends AppCompatActivity {
         buttonReg = findViewById(R.id.btn_register);
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.loginNow);
+
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,10 +138,11 @@ public class Register extends AppCompatActivity {
             }
         });
         //
+
         buttonReg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // delare vairbales
+                // declare variables
                 progressBar.setVisibility(View.VISIBLE);
                 String email, password, firstName, lastName, middleName, birthday, sex, plateNumber, driverLicense, confirmPassword;
                 int selectedId = editSex.getCheckedRadioButtonId();
@@ -146,85 +157,60 @@ public class Register extends AppCompatActivity {
                 confirmPassword = String.valueOf(Objects.requireNonNull(confirmTextPassword.getText()).toString());
                 email = String.valueOf(Objects.requireNonNull(editTextEmail.getText()).toString());
                 password = String.valueOf(Objects.requireNonNull(editTextPassword.getText()).toString());
-                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(middleName) || TextUtils.isEmpty(birthday) || TextUtils.isEmpty(plateNumber) ||TextUtils.isEmpty(driverLicense)||TextUtils.isEmpty(confirmPassword)) {
-                    // If any required field is empty, show error message
-                    Toast.makeText(Register.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-                } else if (!password.equals(confirmPassword)){
-                    // If passwords do not match, show error message
-                    Toast.makeText(Register.this, "Passwords are not matching", Toast.LENGTH_SHORT).show();
-                }else{
-                    loadingbar.setTitle("Customer Registration");
-                    loadingbar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                    loadingbar.setIndeterminate(true);
-                    loadingbar.setCancelable(false);
-                    loadingbar.setMessage("Please Wait..");
-                    loadingbar.show();
-                    mAuth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        CustomerOnlineID = mAuth.getCurrentUser().getUid();
-                                        CustomerDatabaseRef = FirebaseDatabase.getInstance().getReference()
-                                                .child("Users").child("Customers").child(CustomerOnlineID);
-                                        CustomerDatabaseRef.setValue(true);
-                                        HashMap<String, Object> userMap = new HashMap<>();
-                                        userMap.put("firstName", firstName);
-                                        userMap.put("lastName", lastName);
-                                        if(!TextUtils.isEmpty(middleName)) {
-                                            userMap.put("middleName", middleName);
+                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(birthday) || TextUtils.isEmpty(sex) || TextUtils.isEmpty(plateNumber) || TextUtils.isEmpty(driverLicense) || TextUtils.isEmpty(confirmPassword)) {
+                    Toast.makeText(Register.this, "Please Fill in All Fields!", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                } else if (password.equals(confirmPassword)) {
+                    mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(Register.this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                FirebaseUser currentUser = mAuth.getCurrentUser();
+                                assert currentUser != null;
+                                String uid = currentUser.getUid();
+
+                                CollectionReference usersRef = db.collection("drivers");
+                                HashMap<String, Object> userMap = new HashMap<>();
+                                userMap.put("firstName", firstName);
+                                userMap.put("lastName", lastName);
+                                userMap.put("middleName", middleName);
+                                userMap.put("birthday", birthday);
+                                userMap.put("sex", sex);
+                                userMap.put("accountStatus", "unverified");
+                                userMap.put("plateNumber", plateNumber);
+                                userMap.put("driverLicense", driverLicense);
+                                userMap.put("uid", uid);
+                                usersRef.document(uid).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Intent intent = new Intent(Register.this, MainActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            String message = Objects.requireNonNull(task.getException()).getMessage();
+                                            Toast.makeText(Register.this, "Error Occured: " + message, Toast.LENGTH_SHORT).show();
                                         }
-                                        userMap.put("sex", sex);
-                                        userMap.put("birthday", birthday);
-                                        userMap.put("plateNumber", plateNumber);
-                                        userMap.put("accountStatus", "unverified");
-                                        userMap.put("driverLicense", driverLicense);
-                                        userMap.put("password", password);
-                                        userMap.put("email", email);
-                                        CustomerDatabaseRef.updateChildren(userMap);
-                                        Intent intent = new Intent(Register.this, Login.class);
-                                        startActivity(intent);
-                                        finish();
-                                        Toast.makeText(Register.this, "Passenger Registered.",
-                                                Toast.LENGTH_SHORT).show();
-                                        loadingbar.dismiss();
-
-
-                                    } else {
-                                        Toast.makeText(Register.this, "Customer Registration Error." + task.getException().toString(),
-                                                Toast.LENGTH_SHORT).show();
-                                        loadingbar.dismiss();
+                                        progressBar.setVisibility(View.GONE);
                                     }
-                                }
-                            });
+                                });
+                            } else {
+                                String message = Objects.requireNonNull(task.getException()).getMessage();
+                                Toast.makeText(Register.this, "Error Occured: " + message, Toast.LENGTH_SHORT).show();
+                                progressBar.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+                } else {
+                    Toast.makeText(Register.this, "Password not match!", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                 }
-
-
-
-
-
-//                mAuth.createUserWithEmailAndPassword(email, password)
-//                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                            @Override
-//                            public void onComplete(@NonNull Task<AuthResult> task) {
-//                                progressBar.setVisibility(View.GONE);
-//                                if (task.isSuccessful()) {
-//
-//                                    Toast.makeText(Register.this, "Account Created.",
-//                                            Toast.LENGTH_SHORT).show();
-//                                } else {
-//                                    // If sign in fails, display a message to the user.
-//                                    Toast.makeText(Register.this, "Authentication failed.",
-//                                            Toast.LENGTH_SHORT).show();
-//
-//                                }
-//                            }
-//                        });
-
             }
         });
 
+
     }
+
     private void check_terms() {
         buttonReg.setEnabled(checkBox.isChecked());
 
